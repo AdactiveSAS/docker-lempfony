@@ -10,6 +10,20 @@ Set up a development environment in a single container.
 - Composer
 - Symfony
 
+### Fork
+
+Add the following tools:
+
+- PHP modules: php7.0-json, php7.0-sqlite3, php7.0-recode, php7.0-imap, php7.0-curl, php-apcu, php-xdebug, php7.0-snmp
+- Composer / Symfony: bamarni/symfony-console-autocomplete
+- SNMP
+- Redis 
+
+To do :
+
+- Redis: handle database volume
+- Nginx: handle SSL
+
 ### Build
 <pre><code>docker build \
   --build-arg mysql_root_pwd=<i><b>custom_pwd</b></i> \
