@@ -1,0 +1,8 @@
+{
+  "require": {
+    "fxp/composer-asset-plugin": "~1.1",
+    "sstalle/php7cc": "^1.0",
+    "bamarni/symfony-console-autocomplete": "^1.2",
+    "escapestudios/symfony2-coding-standard": "~2.0"
+  }
+}

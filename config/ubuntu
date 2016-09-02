@@ -1,0 +1,2 @@
+# Enable deploy to run set-permissions
+deploy ALL=(ALL) NOPASSWD: ALL
