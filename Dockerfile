@@ -59,7 +59,6 @@ RUN \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-
 WORKDIR /var/www
 
 EXPOSE 80 443
@@ -82,5 +81,10 @@ ENTRYPOINT \
   service nginx start && \
   service redis-server start && \
   /bin/bash -c "source ~/.profile" && \
+# Run docker-init.sh script
+  chmod +x /opt/docker/docker-init.sh && \
+  echo "Running docker-init.sh..." && \
+  sleep 0.5 && \
+  /opt/docker/docker-init.sh && \
 # Run the console
   /bin/bash
