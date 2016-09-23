@@ -1,6 +1,10 @@
-## docker-lempfony
+# docker-lempfony
 
-Set up a development environment in a single container.
+## What is Docker Lempfony ?
+
+Docker-lempfony is a fork of
+> TODO: give the fork 
+which set up a development environment in a single container.
 
 - Ubuntu 16.04
 - Nginx
@@ -10,28 +14,53 @@ Set up a development environment in a single container.
 - Composer
 - Symfony
 
-### Fork
-
-Add the following tools:
+This fork enhance it by adding the following tools:
 
 - PHP modules: php7.0-json, php7.0-sqlite3, php7.0-recode, php7.0-imap, php7.0-curl, php-apcu, php-xdebug, php7.0-snmp
 - Composer / Symfony: bamarni/symfony-console-autocomplete
 - SNMP
 - Redis
 
-To do :
+## TODO
 
 - Redis: handle database volume
 - Nginx: handle SSL
 
+## Installation
+
+### Requirements
+
+#### Clone the repository
+
+<pre><code>sudo apt-get install git
+mkdir <i><b>~/projects</b></i> && cd $_
+git clone https://github.com/AdactiveSAS/docker-lempfony.git --branch <i><b>master<i><b>
+</code></pre>
+
+> Note:  you may configure the target directory by editing the <i><b>~/projects</b></i> argument. To target a specific 
+branch please replace <i><b>master<i><b>.
+
+#### Install docker
+
+> TODO: Give docker installation instruction link
+
+> TODO: Give command to run docker without sudo on Ubuntu !
+
 ### Build
 <pre><code>docker build \
-  --build-arg mysql_root_pwd=<i><b>custom_pwd</b></i> \
   -t adactive/lempfony .</code></pre>
-If ```--build-arg [...]``` is not set, MySQL credentials will be root:development.
 
-### Run 
-#### ...in shell
+The default MYSQL credentials will be root:development.
+
+> Note: You can configure the MYSQL password by setting the build argument
+> 
+> <pre><code>docker build \
+>   --build-arg mysql_root_pwd=<i><b>custom_pwd</b></i> \
+>   -t adactive/lempfony .
+> </code></pre>
+
+## Usage 
+### ...in shell
 <pre><code>docker run -it -p 80:80 \
   -v <i><b>~/projects/log</b></i>:/var/log \
   -v <i><b>~/projects/mysql</b></i>:/var/lib/mysql \
@@ -39,7 +68,7 @@ If ```--build-arg [...]``` is not set, MySQL credentials will be root:developmen
   -v <i><b>~/projects/sites</b></i>:/etc/nginx/sites-available \
   adactive/lempfony:latest</code></pre>
 
-#### ...in detached mode
+### ...in detached mode
 <pre><code>docker run -dit -p 80:80 \
   -v <i><b>~/projects/log</b></i>:/var/log \
   -v <i><b>~/projects/mysql</b></i>:/var/lib/mysql \
@@ -52,7 +81,7 @@ If you need have commands executed after the services launch, you can add the fi
 Take a look [here](conf/opt/docker/) for more informations.
 
 ### Create a new Symfony app
-To quickly setup a functionnal new Symfony app (development only):
+To quickly setup a functional new Symfony app (development only):
 <pre><code>symfony-create <i><b>app-name</b></i> <i><b>[symfony-version]</b></i></code></pre>
 
 ### Troubleshooting
