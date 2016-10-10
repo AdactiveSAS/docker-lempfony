@@ -48,7 +48,7 @@ docker run -it --rm --name lempfony -p 80:80 \
   -v <workspace/log>:/var/log \
   -v <workspace/mysql>:/var/lib/mysql \
   -v <workspace/www>:/var/www \
-  adactive/lempfony:latest
+  signall/lempfony:latest
 ```
 For detached mode, replace the first line by:  
 ```docker run -dit --name lempfony -p 80:80 \```  
