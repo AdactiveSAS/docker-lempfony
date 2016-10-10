@@ -22,7 +22,7 @@ else
   fi
 fi
 
-# Create Symfony app
+# create Symfony app
 echo -e $INF"Creating Symfony project..."$RES
 {
   cd /var/www
@@ -32,7 +32,7 @@ echo -e $INF"Creating Symfony project..."$RES
   exit 1
 }
 
-# Update dependencies
+# update dependencies
 echo -e $INF"Updating project dependencies..."$RES
 {
   cd $APP
@@ -41,7 +41,7 @@ echo -e $INF"Updating project dependencies..."$RES
   echo -e $WAR"Error while updating dependencies."$RES
 }
 
-# Fix access issues
+# fix access issues
 echo -e $INF"Setting up access rights..."$RES
 {
   HTTPDUSER=`ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
@@ -56,7 +56,7 @@ echo -e $INF"Setting up access rights..."$RES
     setfacl -R -m u:$HTTPDUSER:rwX -m u:`whoami`:rwX $ROOT/var/cache $ROOT/var/logs
     setfacl -dR -m u:$HTTPDUSER:rwX -m u:`whoami`:rwX $ROOT/var/cache $ROOT/var/logs
   fi
-  # Enable access to app_dev.php and config.php 
+  # enable access to app_dev.php and config.php 
   sed -i '/if (isset($_SERVER/,+6 s/^/\/\//' $ROOT/web/app_dev.php
   sed -i '/if (!in_array(@$_SERVER/,+6 s/^/\/\//' $ROOT/web/config.php
 } || {
@@ -64,7 +64,7 @@ echo -e $INF"Setting up access rights..."$RES
 }
 
 
-# Create Nginx server block file
+# create Nginx server block file
 echo -e $INF"Adding the website configuration to Nginx..."$RES
 {
 
@@ -94,7 +94,7 @@ echo -e $INF"Adding the website configuration to Nginx..."$RES
   }
 __EOF
 
-  # Enable the new server block configuration
+  # enable the new server block configuration
   ln -s $SERVER_BLOCK /etc/nginx/sites-enabled/
   nginx -t && service nginx reload
 

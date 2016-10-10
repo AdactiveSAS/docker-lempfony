@@ -1,99 +1,88 @@
 # docker-lempfony
 
-## What is Docker Lempfony ?
+Set up a development environment in a single container.
 
-Docker-lempfony is a fork of
-> TODO: give the fork 
-which set up a development environment in a single container.
+Ubuntu 16.04 | Nginx | MySQL | PHP 7.0 | phpMyAdmin | Composer | Symfony  
 
-- Ubuntu 16.04
-- Nginx
-- MySQL
-- PHP 7.0
-- phpMyAdmin
-- Composer
-- Symfony
+### Fork
 
-This fork enhance it by adding the following tools:
-
-- PHP modules: php7.0-json, php7.0-sqlite3, php7.0-recode, php7.0-imap, php7.0-curl, php-apcu, php-xdebug, php7.0-snmp
-- Composer / Symfony: bamarni/symfony-console-autocomplete
+This project is a fork of [naei/docker-lempfony](https://github.com/naei/docker-lempfony).  
+It adapt it for the need of Adactive/Signall projects by adding the following components:
+- PHP modules: 
+  - php7.0-json, php7.0-sqlite3, php7.0-recode, php7.0-imap, php7.0-curl, php-apcu, php-xdebug, php7.0-snmp
+- Composer plugins:
+  - fxp/composer-asset-plugin
+  - sstalle/php7cc
+  - bamarni/symfony-console-autocomplete
+  - escapestudios/symfony2-coding-standard
 - SNMP
 - Redis
 
-## TODO
+### Get the image
 
-- Redis: handle database volume
-- Nginx: handle SSL
+#### ...by pulling it from the Docker Hub Registry:
 
-## Installation
+```shell
+docker pull signall/lempfony
+```  
 
-### Requirements
+#### ...by building it from the sources:
 
-#### Clone the repository
+Clone the project, access it from your terminal, then build it:
 
-<pre><code>sudo apt-get install git
-mkdir <i><b>~/projects</b></i> && cd $_
-git clone https://github.com/AdactiveSAS/docker-lempfony.git --branch <i><b>master<i><b>
-</code></pre>
+```shell
+docker build \
+  --build-arg mysql_root_pwd=<custom_pwd> \
+  -t signall/lempfony .
+```  
 
-> Note:  you may configure the target directory by editing the <i><b>~/projects</b></i> argument. To target a specific 
-branch please replace <i><b>master<i><b>.
+If ```--build-arg [...]``` is not set, MySQL credentials will be root:development.
 
-#### Install docker
 
-> TODO: Give docker installation instruction link
+### Run the container
 
-> TODO: Give command to run docker without sudo on Ubuntu !
+```shell
+docker run -it --rm --name lempfony -p 80:80 \
+  -v <workspace/conf/lempfony>:/etc/opt/lempfony/volume \
+  -v <workspace/conf/nginx-sites>:/etc/nginx/sites-available \
+  -v <workspace/log>:/var/log \
+  -v <workspace/mysql>:/var/lib/mysql \
+  -v <workspace/www>:/var/www \
+  adactive/lempfony:latest
+```
+For detached mode, replace the first line by:  
+```docker run -dit --name lempfony -p 80:80 \```  
 
-### Build
-<pre><code>docker build \
-  -t adactive/lempfony .</code></pre>
+The data volumes are optionals and can be added or removed depending on the needs.  
 
-The default MYSQL credentials will be root:development.
+If you need to have commands executed after the services launch, you can create a init.sh script and share it in a data volume within /opt/lempfony/volume, which is a folder dedicated to user-specific files.
+For detailled information about it, you can take a look at the [example](https://github.com/naei/docker-lempfony/tree/master/example/workspace) workspace on the upstream repository.
 
-> Note: You can configure the MYSQL password by setting the build argument
-> 
-> <pre><code>docker build \
->   --build-arg mysql_root_pwd=<i><b>custom_pwd</b></i> \
->   -t adactive/lempfony .
-> </code></pre>
-
-## Usage 
-### ...in shell
-<pre><code>docker run -it -p 80:80 \
-  -v <i><b>~/projects/log</b></i>:/var/log \
-  -v <i><b>~/projects/mysql</b></i>:/var/lib/mysql \
-  -v <i><b>~/projects/www</b></i>:/var/www \
-  -v <i><b>~/projects/sites</b></i>:/etc/nginx/sites-available \
-  adactive/lempfony:latest</code></pre>
-
-### ...in detached mode
-<pre><code>docker run -dit -p 80:80 \
-  -v <i><b>~/projects/log</b></i>:/var/log \
-  -v <i><b>~/projects/mysql</b></i>:/var/lib/mysql \
-  -v <i><b>~/projects/www</b></i>:/var/www \
-  -v <i><b>~/projects/sites</b></i>:/etc/nginx/sites-available \
-  adactive/lempfony:latest</code></pre>
-
-If you need have commands executed after the services launch, you can add the files docker-init.sh and docker-init.conf into a volume:
-<pre><code>-v <i><b>~/projects/my_project/conf/docker-init/</b></i>:/opt/docker/ \</code></pre>
-Take a look [here](conf/opt/docker/) for more informations.
 
 ### Create a new Symfony app
-To quickly setup a functional new Symfony app (development only):
-<pre><code>symfony-create <i><b>app-name</b></i> <i><b>[symfony-version]</b></i></code></pre>
+From the container shell, you can quickly setup a functionnal new Symfony app:
+```shell
+symfony-create <app-name> [symfony-version]
+```
+Your project will be immediately accessible at &lt;app-name>.dev .
+
 
 ### Troubleshooting
 
-#### Windows host: on which IP the server is running?
-<pre><code>docker inspect --format '{{ .NetworkSettings.IPAddress }}' <i><b>container_name_or_id</b></i> </code></pre>
+#### ➢ I don't know on which IP my container is running
+```shell
+docker inspect --format '{{ .NetworkSettings.IPAddress }}' lempfony
+```  
 
-#### Windows host: the Symfony project creation crash after "Preparing project..."
+#### ➢ The local domain name is not accessible from Firefox
+You might need to add the local domain name into about:config > network.dns.localDomains
+
+#### ➢ Windows host: the Symfony project creation script crash after "Preparing project..."
 The Symfony project creation process works with symlinks. By default on Windows,  only an administrator can create symlink, so be sure that the Docker terminal is launched as an administrator. 
 
-#### Windows host: the local domain names are accessible from inside the container but not from a web browser
+#### ➢ Windows host: the local domain names are accessible from inside the container but not from a web browser
 Each domain name must be binded to the Docker container's IP in the C:\Windows\System32\drivers\etc\hosts file:
-<pre><code>192.168.99.100 project.dev
-192.168.99.100 otherproject.dev</code></pre>
-
+```
+192.168.99.100 project.dev
+192.168.99.100 otherproject.dev
+```  

@@ -1,61 +1,67 @@
 FROM ubuntu:16.04
 MAINTAINER Lucas Pantanella
 
-# Skip "apt-get install" interactive prompts during build
+# skip "apt-get install" interactive prompts during build
 ARG DEBIAN_FRONTEND=noninteractive
 
-# A default MySQL root password can be set at build
-# Otherwise, the password "development" will be used
+# a default MySQL root password can be set at build
+# otherwise, the password "development" will be used
 ARG mysql_root_pwd=development
 
 # Install system
 RUN \
-# Update system & install essential packages
+# update system & install essential packages
   apt-get update && \
   apt-get -y upgrade && \
   apt-get install -y acl curl git nano vim wget && \
-# Install Nginx
+# NGINX
   apt-get install -y nginx && \
-# Install PHP 7.0
+# PHP 7.0
   apt-get install -y php7.0-fpm php7.0-cli php7.0-intl php7.0-xml php7.0-mysql php7.0-zip php7.0-gd php7.0-tidy php7.0-json php7.0-sqlite3 php7.0-recode php7.0-imap php7.0-curl php-apcu php-xdebug && \
- # Install Composer
+  echo "<?php phpinfo(); ?>" > /var/www/index.php && \
+# COMPOSER
   curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-# Install Symfony
+# SYMFONY
   curl -LsS https://symfony.com/installer -o /usr/local/bin/symfony && \
   chmod a+x /usr/local/bin/symfony && \
-# Install MySQL
+# MYSQL
   apt-get install -y mysql-server && \
   usermod -d /var/lib/mysql/ mysql && \
   service mysql start && mysqladmin -u root password $mysql_root_pwd && \
-# Install phpMyAdmin
+# PHPMYADMIN
   apt-get install -y phpmyadmin && \
-# Install Redis
+# REDIS
   apt-get install -y redis-server && \
-# Install SNMP
-  apt-get install -y snmp php7.0-snmp && \
-# Move default MySQL & phpMyAdmin databases to a non-shared folder
-# ...which will be copied back into /var/lib/mysql/ at run
-  service mysql stop && \
-  mkdir /var/lib/mysql-db && \
-  mv /var/lib/mysql/* /var/lib/mysql-db/
+# SNMP
+  apt-get install -y snmp php7.0-snmp
 
-# Add default files, config files, and scripts to the system
-# > /etc/nginx/default/site-default >> default server block configuration (copied back to sites-available at run)
-# > /etc/php/* >> php configuration files
-# > /root/* >> user bash configs (for XDebug, Symfony, Composer...)
-# > /usr/bin/symfony-create >>  Symfony project creation script
-# > /var/www/index.php >> default PHP homepage
+# copy system files - all the files contained in the "conf" folder will be copied to the system keeping the same folder hierarchy
+#   > /etc/nginx/default/site-default >> default server block configuration - will be copied back into /etc/nginx/sites-available/ at run
+#   > /etc/php/* >> php configuration files
+#   > /usr/bin/symfony-create >> Symfony project creation script
+#   > /root/* >> user bash configs (for XDebug, Symfony, Composer...)
 COPY conf /
 
-# Finalize configuration
+# configure environment & finalize installation
 RUN \
-  # Set execution rights the Symfony project creation script
+# backup default MySQL & phpMyAdmin databases to save these data from shared volume - will be copied back into /var/lib/mysql/ at run
+  service mysql stop && \
+  mkdir /var/lib/mysql-db && \
+  mv /var/lib/mysql/* /var/lib/mysql-db/ && \
+# give execution rights to the Symfony project creation script
   chmod a+x /usr/bin/symfony-create && \
-  # Disable XDebug
+# create a lempfony directory dedicated to user-specific files
+  mkdir -p /opt/lempfony/default /opt/lempfony/volume && \
+  # add a default init.sh script - will be copied to /opt/lempfony/volume and executed on container start
+  echo "#!/bin/bash" \
+    "\n\n# This script is executed on container start." \
+    "\n\necho \"   ...no commands specified\"" \
+    > /opt/lempfony/default/init.sh && \
+# disable XDebug
   rm /etc/php/7.0/cli/conf.d/20-xdebug.ini && \
-  # Update composer dependencies
+# update composer dependencies
   composer global update && \
-  # Clean system
+# clean system
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -63,28 +69,34 @@ WORKDIR /var/www
 
 EXPOSE 80 443
 
+# configure the container on 'docker run'
 ENTRYPOINT \
-# Actions on shared volumes
-  # Restore default MySQL & phpMyAdmin databases
+  echo " ###################################" && \
+  echo " ###       docker-lempfony       ###" && \
+  echo " ###################################" && \
+  echo && \
+# handle data volumes
+  # restore default MySQL database and permissions
   cp -rn /var/lib/mysql-db/* /var/lib/mysql && \
-  # Restore and enable Nginx server blocks
+  chown -R mysql /var/lib/mysql && \
+  # restore default Nginx server block and enable all sites
   cp -f /etc/nginx/default/site-default /etc/nginx/sites-available/default && \
   ln -sf /etc/nginx/sites-available/* /etc/nginx/sites-enabled/ && \
-  # Set permissions
-  chown -R mysql /var/lib/mysql && \
-  mkdir -p /var/log/mysql && chown -R mysql /var/log/mysql && \
+  # restore permissions on workspace and logs
   chown -R www-data /var/www && \
   mkdir -p /var/log/nginx && chown -R www-data /var/log/nginx && \
-# Start services
+  mkdir -p /var/log/mysql && chown -R mysql /var/log/mysql && \
+  # restore lempfony init script if none exists
+  cp -n /opt/lempfony/default/init.sh /opt/lempfony/volume/init.sh && \
+  chmod +x /opt/lempfony/volume/init.sh && sync && \
+# start services
   service mysql start && \
   service php7.0-fpm start && \
   service nginx start && \
-  service redis-server start && \
   /bin/bash -c "source ~/.profile" && \
-# Run docker-init.sh script
-  chmod +x /opt/docker/docker-init.sh && \
-  echo "Running docker-init.sh..." && \
-  sleep 0.5 && \
-  /opt/docker/docker-init.sh && \
-# Run the console
+# execute lempfony init script in a subshell
+  echo " * Executing user-specific configuration" && \
+  (cd /opt/lempfony/volume && ./init.sh) && \
+# run bash
+  echo && \
   /bin/bash
