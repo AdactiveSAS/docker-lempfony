@@ -1,5 +1,7 @@
 # docker-lempfony
 
+[![Docker Automated Build](https://img.shields.io/docker/automated/signall/lempfony.svg?maxAge=2592000)](https://hub.docker.com/r/signall/lempfony/)
+
 Set up a development environment in a single container.
 
 Ubuntu 16.04 | Nginx | MySQL | PHP 7.0 | phpMyAdmin | Composer | Symfony  
@@ -8,15 +10,21 @@ Ubuntu 16.04 | Nginx | MySQL | PHP 7.0 | phpMyAdmin | Composer | Symfony
 
 This project is a fork of [naei/docker-lempfony](https://github.com/naei/docker-lempfony).  
 It adapt it for the need of Adactive/Signall projects by adding the following components:
-- PHP modules: 
-  - php7.0-json, php7.0-sqlite3, php7.0-recode, php7.0-imap, php7.0-curl, php-apcu, php-xdebug, php7.0-snmp
+- Ant
+- Capistrano
+- Configuration files:
+  - PHP / PHP-FPM conf.d
+  - User bash configs for XDebug, Symfony, Composer...
 - Composer plugins:
   - fxp/composer-asset-plugin
   - sstalle/php7cc
   - bamarni/symfony-console-autocomplete
   - escapestudios/symfony2-coding-standard
+- PHP modules: 
+  - php7.0-json, php7.0-sqlite3, php7.0-recode, php7.0-imap, php7.0-curl, php-apcu, php-xdebug, php7.0-snmp
 - SNMP
 - Redis
+
 
 ### Get the image
 

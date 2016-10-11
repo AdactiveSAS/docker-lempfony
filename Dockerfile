@@ -33,7 +33,13 @@ RUN \
 # REDIS
   apt-get install -y redis-server && \
 # SNMP
-  apt-get install -y snmp php7.0-snmp
+  apt-get install -y snmp php7.0-snmp && \
+# CAPISTRANO
+  apt-get install -y ant capistrano && \
+  gem install capistrano && \
+  gem install capistrano-symfony && \
+  gem install capistrano-maintenance && \
+  gem install capistrano-nginx
 
 # copy system files - all the files contained in the "conf" folder will be copied to the system keeping the same folder hierarchy
 #   > /etc/nginx/default/site-default >> default server block configuration - will be copied back into /etc/nginx/sites-available/ at run
