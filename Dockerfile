@@ -36,7 +36,7 @@ RUN \
   apt-get install -y snmp php7.0-snmp && \
 # CAPISTRANO
   apt-get install -y ant capistrano && \
-  gem install capistrano && \
+  gem install capistrano -v 3.4.0 && \
   gem install capistrano-symfony && \
   gem install capistrano-maintenance && \
   gem install capistrano-nginx

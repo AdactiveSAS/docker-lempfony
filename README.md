@@ -11,7 +11,7 @@ Ubuntu 16.04 | Nginx | MySQL | PHP 7.0 | phpMyAdmin | Composer | Symfony
 This project is a fork of [naei/docker-lempfony](https://github.com/naei/docker-lempfony).  
 It adapt it for the need of Adactive/Signall projects by adding the following components:
 - Ant
-- Capistrano
+- Capistrano 3.4.0
 - Configuration files:
   - PHP / PHP-FPM conf.d
   - User bash configs for XDebug, Symfony, Composer...
