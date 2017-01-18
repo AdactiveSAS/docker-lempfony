@@ -31,7 +31,7 @@ It adapt it for the need of Adactive/Signall projects by adding the following co
 #### ...by pulling it from the Docker Hub Registry:
 
 ```shell
-docker pull signall/lempfony
+docker pull adsum/lempfony
 ```  
 
 #### ...by building it from the sources:
@@ -41,7 +41,7 @@ Clone the project, access it from your terminal, then build it:
 ```shell
 docker build \
   --build-arg mysql_root_pwd=<custom_pwd> \
-  -t signall/lempfony .
+  -t adsum/lempfony .
 ```  
 
 If ```--build-arg [...]``` is not set, MySQL credentials will be root:development.

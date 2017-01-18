@@ -13,11 +13,11 @@ RUN \
 # update system & install essential packages
   apt-get update && \
   apt-get -y upgrade && \
-  apt-get install -y acl curl git nano vim wget && \
+  apt-get install -y acl curl git nano vim wget htop realpath mysql-client && \
 # NGINX
   apt-get install -y nginx && \
 # PHP 7.0
-  apt-get install -y php7.0-fpm php7.0-cli php7.0-intl php7.0-xml php7.0-mysql php7.0-zip php7.0-gd php7.0-tidy php7.0-json php7.0-sqlite3 php7.0-recode php7.0-imap php7.0-curl php-apcu php-xdebug && \
+  apt-get install -y php7.0-fpm php7.0-cli php7.0-intl php7.0-xml php7.0-mysql php7.0-zip php7.0-gd php7.0-tidy php7.0-json php7.0-sqlite3 php7.0-recode php7.0-imap php7.0-curl php-apcu php7.0-xsl php-xdebug && \
   echo "<?php phpinfo(); ?>" > /var/www/index.php && \
 # COMPOSER
   curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
@@ -31,9 +31,15 @@ RUN \
 # PHPMYADMIN
   apt-get install -y phpmyadmin && \
 # REDIS
-  apt-get install -y redis-server && \
+  apt-get install -y redis-server redis-tools && \
 # SNMP
   apt-get install -y snmp php7.0-snmp && \
+# NodeJs
+  apt-get install -y nodejs && \
+# Blender
+  apt-get install -y blender && \
+# s3cm
+  apt-get install -y s3cmd && \
 # CAPISTRANO
   apt-get install -y ant capistrano && \
   gem install capistrano -v 3.4.0 && \
@@ -50,6 +56,9 @@ COPY conf /
 
 # configure environment & finalize installation
 RUN \
+# OpenSceneGraph
+  cd /tmp && tar -xvzf osg.tar.gz && chmod +x osg/bin/* osg/lib/* && \
+  cp -R osg/bin/* /usr/local/bin && cp -R osg/lib/* /usr/local/lib && ldconfig && \
 # backup default MySQL & phpMyAdmin databases to save these data from shared volume - will be copied back into /var/lib/mysql/ at run
   service mysql stop && \
   mkdir /var/lib/mysql-db && \
@@ -99,6 +108,7 @@ ENTRYPOINT \
   service mysql start && \
   service php7.0-fpm start && \
   service nginx start && \
+  service redis start && \
   /bin/bash -c "source ~/.profile" && \
 # execute lempfony init script in a subshell
   echo " * Executing user-specific configuration" && \
