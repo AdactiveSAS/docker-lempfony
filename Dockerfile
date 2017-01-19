@@ -98,7 +98,7 @@ ENTRYPOINT \
   cp -f /etc/nginx/default/site-default /etc/nginx/sites-available/default && \
   ln -sf /etc/nginx/sites-available/* /etc/nginx/sites-enabled/ && \
   # restore permissions on workspace and logs
-  chown -R www-data /var/www && \
+  chmod 1777 /tmp && \
   mkdir -p /var/log/nginx && chown -R www-data /var/log/nginx && \
   mkdir -p /var/log/mysql && chown -R mysql /var/log/mysql && \
   # restore lempfony init script if none exists
@@ -108,7 +108,7 @@ ENTRYPOINT \
   service mysql start && \
   service php7.0-fpm start && \
   service nginx start && \
-  service redis start && \
+  service redis-server start && \
   /bin/bash -c "source ~/.profile" && \
 # execute lempfony init script in a subshell
   echo " * Executing user-specific configuration" && \
