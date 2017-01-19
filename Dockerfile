@@ -89,7 +89,6 @@ ENTRYPOINT \
   cp -f /etc/nginx/default/site-default /etc/nginx/sites-available/default && \
   ln -sf /etc/nginx/sites-available/* /etc/nginx/sites-enabled/ && \
   # restore permissions on workspace and logs
-  chown -R www-data /var/www && \
   mkdir -p /var/log/nginx && chown -R www-data /var/log/nginx && \
   mkdir -p /var/log/mysql && chown -R mysql /var/log/mysql && \
   # restore lempfony init script if none exists
