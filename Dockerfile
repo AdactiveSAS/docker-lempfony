@@ -13,7 +13,7 @@ RUN \
 # update system & install essential packages
   apt-get update && \
   apt-get -y upgrade && \
-  apt-get install -y acl curl git nano vim wget htop realpath mysql-client && \
+  apt-get install -y acl curl git nano vim wget htop realpath mysql-client build-essential tcl && \
 # NGINX
   apt-get install -y nginx && \
 # PHP 7.0
@@ -54,11 +54,17 @@ RUN \
 #   > /root/* >> user bash configs (for XDebug, Symfony, Composer...)
 COPY conf /
 
+COPY lib/osg.tar.gz /tmp/osg.tar.gz
+
 # configure environment & finalize installation
 RUN \
 # OpenSceneGraph
   cd /tmp && tar -xvzf osg.tar.gz && chmod +x osg/bin/* osg/lib/* && \
   cp -R osg/bin/* /usr/local/bin && cp -R osg/lib/* /usr/local/lib && ldconfig && \
+# Create databases
+  service mysql start && \
+  mysqladmin -u root -p$mysql_root_pwd create adsum && \
+  mysqladmin -u root -p$mysql_root_pwd create adsum-recovery && \
 # backup default MySQL & phpMyAdmin databases to save these data from shared volume - will be copied back into /var/lib/mysql/ at run
   service mysql stop && \
   mkdir /var/lib/mysql-db && \
