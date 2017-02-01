@@ -84,7 +84,8 @@ RUN \
   composer global update && \
 # clean system
   apt-get clean && \
-  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+  mkdir /var/log/redis && chown redis:redis /var/log/redis
 
 WORKDIR /var/www
 
@@ -101,6 +102,7 @@ ENTRYPOINT \
   cp -rn /var/lib/mysql-db/* /var/lib/mysql && \
   chown -R mysql /var/lib/mysql && \
   # restore default Nginx server block and enable all sites
+  cp -f /etc/php/7.0/fpm/default/www.conf /etc/php/7.0/fpm/pool.d/www.conf && \
   cp -f /etc/nginx/default/site-default /etc/nginx/sites-available/default && \
   ln -sf /etc/nginx/sites-available/* /etc/nginx/sites-enabled/ && \
   # restore permissions on workspace and logs
