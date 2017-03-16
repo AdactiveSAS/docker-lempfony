@@ -54,7 +54,7 @@ RUN \
 #   > /root/* >> user bash configs (for XDebug, Symfony, Composer...)
 COPY conf /
 
-COPY lib/osg.tar.gz /tmp/osg.tar.gz
+ADD https://github.com/AdactiveSAS/osg/releases/download/OpenSceneGraph-3.3.3-ADACTIVE/osg.tar.gz /tmp/osg.tar.gz
 
 # configure environment & finalize installation
 RUN \
@@ -85,7 +85,7 @@ RUN \
 # clean system
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-  mkdir /var/log/redis && chown redis:redis /var/log/redis
+  mkdir -p /var/log/redis && chown redis:redis /var/log/redis
 
 WORKDIR /var/www
 
