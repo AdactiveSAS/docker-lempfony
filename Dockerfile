@@ -12,6 +12,9 @@ ARG mysql_root_pwd=development
 RUN \
 # update system & install essential packages
   apt-get update && \
+  apt-get install -y software-properties-common python-software-properties && \
+  add-apt-repository -y ppa:thomas-schiex/blender && \
+  apt-get update && \
   apt-get -y upgrade && \
   apt-get install -y acl curl git nano vim wget htop realpath mysql-client build-essential tcl && \
 # NGINX
