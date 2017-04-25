@@ -90,6 +90,11 @@ RUN \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
   mkdir -p /var/log/redis && chown redis:redis /var/log/redis
 
+RUN \
+  usermod -a -G redis www-data && \
+  usermod -a -G redis ubuntu && \
+  usermod -a -G www-data ubuntu
+
 WORKDIR /var/www
 
 EXPOSE 80 443
