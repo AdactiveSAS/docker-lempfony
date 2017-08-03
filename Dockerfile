@@ -67,7 +67,6 @@ RUN \
 # Create databases
   service mysql start && \
   mysqladmin -u root -p$mysql_root_pwd create adsum && \
-  mysqladmin -u root -p$mysql_root_pwd create adsum-recovery && \
 # backup default MySQL & phpMyAdmin databases to save these data from shared volume - will be copied back into /var/lib/mysql/ at run
   service mysql stop && \
   mkdir /var/lib/mysql-db && \
@@ -88,12 +87,8 @@ RUN \
 # clean system
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-  mkdir -p /var/log/redis && chown redis:redis /var/log/redis
-
-RUN \
-  usermod -a -G redis www-data && \
-  usermod -a -G redis ubuntu && \
-  usermod -a -G www-data ubuntu
+  mkdir -p /var/log/redis && touch /var/log/redis/redis-server.log && chown -R redis:redis /var/log/redis && \
+  usermod -a -G redis www-data
 
 WORKDIR /var/www
 
